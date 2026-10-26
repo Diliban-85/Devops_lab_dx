@@ -1,0 +1,77 @@
+EXP 4 :
+----------------
+
+Script :
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building Application'
+                sh 'echo "Hello Jenkins!" > app.txt'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'cat app.txt'
+                echo 'Test Successful'
+            }
+        }
+    }
+}
+----------------
+EXP 4:
+
+---------------
+sudo apt update
+sudo apt install -y apache2
+sudo systemctl enable --now apache2
+
+sudo systemctl status apache2
+#Enabling Deployment Permission
+sudo visudo
+||| Add this line at bottom
+jenkins ALL=(root) NOPASSWD: /usr/bin/cp
+
+#save and exit
+#verify 
+sudo -l -U jenkins
+#Output-la /usr/bin/cp-ku NOPASSWD permission irukkanum.
+
+MyFirstCD pipeline script:
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                sh 'mkdir -p deploy'
+                sh 'echo "Hello from Jenkins CD Pipeline!" > deploy/index.html'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh 'sudo cp deploy/index.html /var/www/html/index.html'
+                sh 'cat /var/www/html/index.html'
+            }
+        }
+    }
+}
+
+#Run from Build now and check the Console Output
+# go to Terminal and deploy it ..
+
+cat /var/www/html/index.html
+
+#To verify in browser 
+http://localhost
+
+Output will be shown :
+Hello from Jenkins CD Pipeline!
+............
+
