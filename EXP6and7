@@ -1,0 +1,123 @@
+sudo apt update
+sudo apt install ansible -y
+ansible --version
+mkdir ~/ansible_webapp
+cd ~/ansible_webapp
+#create file 
+nano inventory
+#paste it ...
+[webservers]
+localhost ansible_connection=local
+//
+
+
+nano playbook.yml
+---
+- name: Deploy Simple Web Application
+  hosts: webservers
+  become: yes
+
+  tasks:
+    - name: Install Apache
+      apt:
+        name: apache2
+        state: present
+        update_cache: yes
+
+    - name: Start Apache
+      service:
+        name: apache2
+        state: started
+        enabled: yes
+
+    - name: Create web page
+      copy:
+        content: "<h1>Welcome to Ansible Web Application</h1>"
+        dest: /var/www/html/index.html
+
+//////////////////////
+
+nano ansible.cfg
+[defaults]
+timeout = 30
+
+[privilege_escalation]
+become_timeout = 60
+---------------
+#Run the test again
+ansible -i inventory webservers -m command -a "whoami" -b -K
+Output: should be like 
+
+localhost | CHANGED | rc=0 >>
+root
+
+#execute playbook
+sudo ansible-playbook -i inventory playbook.yml
+(or) sudo ansible-playbook -i inventory playbook.yml -K 
+sudo systemctl status apache2
+curl http://localhost
+
+OUTPUT:
+<h1>Welcome to Ansible Web Application</h1>
+
+
+--------------------------------------------------------------------------
+
+EXP 7: SImple Application Using Gradle.
+
+2. Procedure
+Step 1: Install Java
+sudo apt update
+sudo apt install openjdk-21-jdk -y
+
+sudo apt install gradle -y
+gradle --version
+
+mkdir ~/gradle_app
+cd ~/gradle_app
+
+Create the Java source directory:
+mkdir -p src/main/java
+
+Step 4: Create the Java program
+nano src/main/java/App.java
+
+public class App {
+    public static void main(String[] args) {
+        System.out.println("Hello World!");
+        System.out.println("Gradle Application Executed Successfully");
+    }
+}
+
+Step 5: Create the Gradle build file
+nano build.gradle
+
+plugins {
+    id 'application'
+}
+
+application {
+    mainClass = 'App'
+}
+------
+(or)
+
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'Hello'
+
+--------------
+
+#commands to execute
+gradle build
+gradle run
+
+OUTPUT:
+
+Hello World!
+Gradle Application Executed Successfully
+
+BUILD SUCCESSFUL
+
+-----------------======================
