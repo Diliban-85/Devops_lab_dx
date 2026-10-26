@@ -1,1 +1,84 @@
 EXP8:
+
+sudo apt install ansible -y
+ansible --version
+
+mkdir -p ~/ansible_role/roles/webserver/tasks
+mkdir -p ~/ansible_role/roles/webserver/handlers
+mkdir -p ~/ansible_role/roles/webserver/defaults
+cd ~/ansible_role
+
+nano inventory
+
+[webservers]
+localhost ansible_connection=local
+
+----------
+nano roles/webserver/defaults/main.yml
+
+---
+webserver_package: apache2
+webserver_service: apache2
+
+*****************
+
+nano roles/webserver/tasks/main.yml
+
+---
+- name: Install Apache
+  apt:
+    name: "{{ webserver_package }}"
+    state: present
+    update_cache: yes
+
+- name: Start Apache
+  service:
+    name: "{{ webserver_service }}"
+    state: started
+    enabled: yes
+
+////////////
+
+nano roles/webserver/handlers/main.yml
+
+---
+- name: Restart Apache
+  service:
+    name: apache2
+    state: restarted
+///////
+nano playbook.yml
+
+---
+- name: Configure Web Server Using Ansible Role
+  hosts: webservers
+  become: yes
+
+  roles:
+    - webserver
+
+///////
+
+sudo ansible-playbook -i inventory playbook.yml --ask-become-pass
+sudo systemctl status apache2
+curl http://localhost
+
+----Apache's default HTML page content should appear in the terminal.
+
+=================================
+
+EXPECTED OUTPUT:
+
+PLAY [Configure Web Server Using Ansible Role]
+
+TASK [Gathering Facts]
+ok: [localhost]
+
+TASK [webserver : Install Apache]
+ok: [localhost]
+
+TASK [webserver : Start Apache]
+ok: [localhost]
+
+PLAY RECAP
+localhost : ok=3 changed=0 unreachable=0 failed=0
