@@ -46,6 +46,10 @@ ls -l /etc/apt/keyrings/jenkins-keyring.asc
 sudo mkdir -p /etc/apt/keyrings
 sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc https://pkg.jenkins.io/debian-stable/jenkins.io-2026.key
 echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" | sudo tee /etc/apt/sources.list.d/jenkins.list
+(or )
+echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
+https://pkg.jenkins.io/debian-stable binary/ | \
+sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
 
 #update 
 sudo apt update
@@ -76,3 +80,14 @@ Log in using Password and create profile..
 
 OUTPUT : Dashboard view
 ..
+
+
+#To reinstall jenkins for new profile 
+sudo apt stop jenkins
+sudo apt purge jenkins
+
+sudo rm -rf /var/lib/jenkins
+sudo rm -rf /var/cache/jenkins
+
+sudo apt update
+sudo apt install jenkins
