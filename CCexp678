@@ -1,0 +1,25 @@
+#on VM2:
+hostname -I (or) ip addr
+
+sudo apt update
+sudo apt install openssh-server
+
+sudo systemctl status ssh
+sudo systemctl enable --now ssh
+
+#on vm1:
+
+sudo apt update
+sudo apt install openssh-server
+
+sudo systemctl status ssh
+sudo systemctl enable --now ssh
+-----------------------
+
+#test connection on vm1
+ssh user@192.168.56.102
+
+echo "Cloud Computing Lab File" > sample.txt
+scp sample.txt user@192.168.56.102:/home/user/
+
+type ls on vm2 to show the file ...
