@@ -1,0 +1,131 @@
+2. Software Requirements
+- Ubuntu Linux
+- Java JDK 8
+- Apache Hadoop 2.7.3
+- OpenSSH Server
+
+----------------
+sudo apt update
+sudo apt install -y openjdk-8-jdk openssh-server
+java -version
+javac -version
+
+nano ~/.bashrc
+
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export PATH=$PATH:$JAVA_HOME/bin
+#save
+source ~/.bashrc
+#verify
+echo $JAVA_HOME
+java -version
+
+#download hadoop
+cd ~
+wget https://archive.apache.org/dist/hadoop/common/hadoop-2.7.3/hadoop-2.7.3.tar.gz
+#extract
+tar -xzf hadoop-2.7.3.tar.gz
+#rename
+mv hadoop-2.7.3 hadoop
+
+nano ~/.bashrc
+
+export HADOOP_HOME=$HOME/hadoop
+export HADOOP_CONF_DIR=$HADOOP_HOME/etc/hadoop
+export HADOOP_COMMON_HOME=$HADOOP_HOME
+export HADOOP_HDFS_HOME=$HADOOP_HOME
+export HADOOP_MAPRED_HOME=$HADOOP_HOME
+export HADOOP_YARN_HOME=$HADOOP_HOME
+export PATH=$PATH:$HADOOP_HOME/bin:$HADOOP_HOME/sbin
+
+source ~/.bashrc
+
+#verify
+hadoop version
+---------------------------------------------------------
+sudo service ssh start
+ssh-keygen -t rsa -P "" -f ~/.ssh/id_rsa
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+ssh localhost
+exit
+
+---------------------
+
+#configure hadoop
+
+nano ~/hadoop/etc/hadoop/hadoop-env.sh
+
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
+nano ~/hadoop/etc/hadoop/core-site.xml
+
+<?xml version="1.0"?>
+<configuration>
+
+    <property>
+        <name>fs.defaultFS</name>
+        <value>hdfs://localhost:9000</value>
+    </property>
+
+</configuration>
+--------------------------------------
+nano ~/hadoop/etc/hadoop/hdfs-site.xml
+
+<?xml version="1.0"?>
+<configuration>
+
+    <property>
+        <name>dfs.replication</name>
+        <value>1</value>
+    </property>
+
+    <property>
+        <name>dfs.namenode.name.dir</name>
+        <value>file:///home/USER/hadoopdata/namenode</value>
+    </property>
+
+    <property>
+        <name>dfs.datanode.data.dir</name>
+        <value>file:///home/USER/hadoopdata/datanode</value>
+    </property>
+
+</configuration>
+  -------------------------------
+
+cp ~/hadoop/etc/hadoop/mapred-site.xml.template ~/hadoop/etc/hadoop/mapred-site.xml
+nano ~/hadoop/etc/hadoop/mapred-site.xml
+
+<?xml version="1.0"?>
+<configuration>
+
+    <property>
+        <name>mapreduce.framework.name</name>
+        <value>yarn</value>
+    </property>
+
+</configuration>
+  -------------------------
+
+nano ~/hadoop/etc/hadoop/yarn-site.xml
+
+<?xml version="1.0"?>
+<configuration>
+
+    <property>
+        <name>yarn.nodemanager.aux-services</name>
+        <value>mapreduce_shuffle</value>
+    </property>
+
+</configuration>
+  -------------------
+
+mkdir -p ~/hadoopdata/namenode
+mkdir -p ~/hadoopdata/datanode
+
+hdfs namenode -format
+
+#error:
+which hdfs
+echo $HADOOP_HOME
+
