@@ -1,0 +1,144 @@
+package Custom;
+
+import org.cloudbus.cloudsim.*;
+import org.cloudbus.cloudsim.core.CloudSim;
+import org.cloudbus.cloudsim.provisioners.*;
+import java.util.*;
+
+public class Cloudminsche {
+
+    public static void main(String[] args) {
+
+        try {
+            CloudSim.init(1, Calendar.getInstance(), false);
+
+            // Create Datacenter
+            List<Host> hostList = new ArrayList<>();
+
+            List<Pe> peList = new ArrayList<>();
+            for (int i = 0; i < 4; i++) {
+                peList.add(new Pe(i, new PeProvisionerSimple(3000)));
+            }
+
+            hostList.add(new Host(
+                0,
+                new RamProvisionerSimple(8192),
+                new BwProvisionerSimple(10000),
+                1000000,
+                peList,
+                new VmSchedulerTimeShared(peList)
+            ));
+
+            DatacenterCharacteristics characteristics =
+                new DatacenterCharacteristics(
+                    "x86", "Linux", "Xen",
+                    hostList, 10.0, 3.0, 0.05, 0.001, 0.0
+                );
+
+            new Datacenter(
+                "Datacenter",
+                characteristics,
+                new VmAllocationPolicySimple(hostList),
+                new LinkedList<Storage>(),
+                0
+            );
+
+            // Create Broker
+            DatacenterBroker broker = new DatacenterBroker("Broker");
+            int brokerId = broker.getId();
+
+            // Create VMs
+            List<Vm> vmList = new ArrayList<>();
+            int[] mips = {1000, 2000, 1500};
+
+            for (int i = 0; i < mips.length; i++) {
+                vmList.add(new Vm(
+                    i, brokerId, mips[i], 1, 1024,
+                    1000, 10000, "Xen",
+                    new CloudletSchedulerSpaceShared()
+                ));
+            }
+
+            broker.submitVmList(vmList);
+
+            // Create Cloudlets
+            List<Cloudlet> cloudletList = new ArrayList<>();
+            long[] lengths = {10000, 20000, 5000, 15000, 8000};
+
+            UtilizationModel utilization =
+                new UtilizationModelFull();
+
+            for (int i = 0; i < lengths.length; i++) {
+                Cloudlet cloudlet = new Cloudlet(
+                    i, lengths[i], 1, 300, 300,
+                    utilization, utilization, utilization
+                );
+
+                cloudlet.setUserId(brokerId);
+                cloudletList.add(cloudlet);
+            }
+
+            // SJF Scheduling
+            cloudletList.sort(
+                Comparator.comparingLong(Cloudlet::getCloudletLength)
+            );
+
+            double[] availableTime = {0, 0, 0};
+
+            for (Cloudlet cloudlet : cloudletList) {
+                int bestVm = 0;
+                double minFinishTime = Double.MAX_VALUE;
+
+                for (int j = 0; j < vmList.size(); j++) {
+                    double finishTime =
+                        availableTime[j]
+                        + (double) cloudlet.getCloudletLength()
+                        / vmList.get(j).getMips();
+
+                    if (finishTime < minFinishTime) {
+                        minFinishTime = finishTime;
+                        bestVm = j;
+                    }
+                }
+
+                cloudlet.setVmId(bestVm);
+
+                availableTime[bestVm] = minFinishTime;
+            }
+
+            broker.submitCloudletList(cloudletList);
+
+            // Start Simulation
+            CloudSim.startSimulation();
+
+            List<Cloudlet> results = broker.getCloudletReceivedList();
+
+            CloudSim.stopSimulation();
+
+            // Display Results
+            System.out.println("\n========== SJF SCHEDULING RESULTS ==========");
+            System.out.println("Cloudlet ID\tVM ID\tStatus\t\tLength");
+
+            int success = 0;
+
+            for (Cloudlet c : results) {
+                System.out.println(
+                    c.getCloudletId() + "\t\t" +
+                    c.getVmId() + "\t" +
+                    c.getStatus() + "\t\t" +
+                    c.getCloudletLength()
+                );
+
+                if (c.getStatus() == Cloudlet.SUCCESS) {
+                    success++;
+                }
+            }
+
+            System.out.println("\nSuccessful Cloudlets: " + success);
+            System.out.println("Total Cloudlets: " + cloudletList.size());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
