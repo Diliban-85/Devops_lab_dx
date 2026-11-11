@@ -129,4 +129,81 @@ hdfs namenode -format
 
 which hdfs
 echo $HADOOP_HOME
+----------------
+HADOOP WORDCOUNT PROGRAM – COMMANDS AND OUTPUT
 
+1. Format Hadoop Namenode:
+
+~/hadoop/bin/hdfs namenode -format
+
+2. Check Hadoop Version:
+
+~/hadoop/bin/hadoop version
+
+3. Start HDFS:
+
+~/hadoop/sbin/start-dfs.sh
+
+4. Start YARN:
+
+~/hadoop/sbin/start-yarn.sh
+
+5. Check Running Hadoop Services:
+
+jps
+
+Expected Output:
+
+NameNode
+DataNode
+SecondaryNameNode
+ResourceManager
+NodeManager
+Jps
+
+6. Create WordCount Directory:
+
+mkdir -p ~/wordcount
+
+7. Create Input File:
+
+echo "hello hadoop hello world hadoop big data hello" > ~/wordcount/input.txt
+
+8. Create HDFS Input Directory:
+
+~/hadoop/bin/hdfs dfs -mkdir -p /input
+
+9. Upload Input File to HDFS:
+
+~/hadoop/bin/hdfs dfs -put ~/wordcount/input.txt /input/
+
+10. Execute WordCount Program:
+
+~/hadoop/bin/hadoop jar ~/hadoop-2.7.3/share/hadoop/mapreduce/hadoop-mapreduce-examples-2.7.3.jar wordcount /input /output
+
+11. Display WordCount Output:
+
+~/hadoop/bin/hdfs dfs -cat /output/part-r-00000
+
+OUTPUT:
+
+big     1
+data    1
+hadoop  2
+hello   3
+world   1
+
+12. View Original Input File:
+
+cd ~/wordcount
+
+cat input.txt
+
+INPUT:
+
+hello hadoop hello world hadoop big data hello
+
+RESULT:
+
+The Hadoop WordCount program was executed successfully.
+The number of occurrences of each word was counted using MapReduce.
