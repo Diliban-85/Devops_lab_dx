@@ -125,7 +125,8 @@ mkdir -p ~/hadoopdata/datanode
 
 hdfs namenode -format
 
-#error:
+#error in case : check
+
 which hdfs
 echo $HADOOP_HOME
 
