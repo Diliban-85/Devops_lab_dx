@@ -14,6 +14,10 @@ sudo apt install openssh-server
 
 sudo systemctl status ssh
 sudo systemctl enable --now ssh
+
+#error
+sudo nano /etc/ssh/sshd_config
+password Authentication set to yes
 -----------------------
 
 #test connection on vm1
@@ -23,3 +27,7 @@ echo "Cloud Computing Lab File" > sample.txt
 scp sample.txt user@192.168.56.102:/home/user/
 
 type ls on vm2 to show the file ...
+
+---------------------------------------------------------------------------
+
+Exp 8: 
