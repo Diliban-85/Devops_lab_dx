@@ -1,0 +1,38 @@
+# 1. Update Ubuntu
+sudo apt update
+
+# 2. Install Docker
+sudo apt install docker.io -y
+
+# 3. Start Docker
+sudo systemctl enable --now docker
+
+# 4. Check Docker version
+docker --version
+
+# 5. Download Hadoop image
+sudo docker pull apache/hadoop:3.5.0
+
+# 6. Create and run Hadoop container
+sudo docker run -it --name hadoop apache/hadoop:3.5.0 bash
+
+# 7. Check Hadoop version (inside container)
+hadoop version
+
+# 8. Create input file
+echo "hello world hello hadoop" > file.txt
+
+# 9. Create input directory
+mkdir input
+
+# 10. Move file into input directory
+mv file.txt input/
+
+# 11. Run WordCount program
+hadoop jar /opt/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.5.0.jar wordcount input output
+
+# 12. Display output
+cat output/part-r-00000
+
+# 13. Exit container
+exit
