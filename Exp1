@@ -1,0 +1,41 @@
+
+*Step 1: Update pannu*
+
+sudo apt update
+sudo apt install -y gnupg wget apt-transport-https
+
+*Step 2: OpenNebula Key + Repo add pannu*
+wget -q -O- https://downloads.opennebula.io/repo/repo2.key | sudo apt-key add -
+
+echo "deb https://downloads.opennebula.io/repo/6.8/Ubuntu/22.04 stable opennebula" | sudo tee /etc/apt/sources.list.d/opennebula.list
+
+*Step 3: Install pannu*
+
+sudo apt update
+sudo apt install -y opennebula opennebula-sunstone opennebula-gate opennebula-flow
+
+*Step 4: Password set pannu*
+
+
+sudo -u oneadmin bash -c 'echo "oneadmin:adkjazz123" > /var/lib/one/.one/one_auth'
+
+Inga `adkjazz123` ku bathila un password ah podu bro!
+
+*Step 5: Start pannu*
+
+sudo systemctl enable --now opennebula
+sudo systemctl enable --now opennebula-sunstone
+sudo systemctl enable --now opennebula-gate
+sudo systemctl enable --now opennebula-flow
+
+*Step 6: Login pannu*
+
+Browser la:
+http://localhost:9869
+*Username:* `oneadmin`
+*Password:* Nee Step 4 la kudutha password!
+
+Mudinjuthu bro! Dashboard vanthidum!
+
+*Un VM Ubuntu ethana bro? `22.04` ah illa `20.04` ah?*
+Sollu, athuku etha mathiri exact command ah kudukren!
