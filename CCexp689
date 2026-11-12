@@ -30,5 +30,36 @@ type ls on vm2 to show the file ...
 
 ---------------------------------------------------------------------------
 
-Exp 8:
+Exp 9:
 
+mkdir subtraction-docker
+cd subtraction-docker
+
+nano subtraction.py
+.... program ...
+
+nano Dockerfile
+
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY subtraction.py .
+
+CMD ["python", "-u", "subtraction.py"]
+
+#build image
+sudo docker build -t my-subtraction:v1 .
+
+#run locally
+sudo docker run -it my-subtraction:v1
+
+sudo docker login
+#tag image
+sudo docker tag my-subtraction:v1 YOUR_USERNAME/my-subtraction:v1
+
+#push image
+sudo docker push YOUR_USERNAME/my-subtraction:v1
+
+#pull image
+sudo docker pull YOUR_USERNAME/my-subtraction:v1
